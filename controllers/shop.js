@@ -23,3 +23,29 @@ exports.postAddProduct = (req, res, next) => {
       res.status(400).send(err);
     });
 };
+
+exports.getProducts = (req, res, next) => {
+  Products.find({ userId: req.user._id })
+    .populate("userId", "email")
+    .then((products) => {
+      res.status(200).send(products);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+};
+
+exports.postDelete = (req, res, next) => {
+  const prodId = req.body.prodId;
+
+  Products.deleteOne({
+    _id: prodId,
+    userId: req.user._id,
+  })
+    .then((response) => {
+      res.status(200).send("success");
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+};

@@ -9,7 +9,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
   })
 );
 
@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   User.findById("5e89116d64547e20500fba3a")
+
     .then((user) => {
       req.user = user;
       // console.log(req.user);
