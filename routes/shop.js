@@ -12,4 +12,6 @@ router.post("/delete-selling-item", shopController.postSellingDelete);
 
 router.get("/get-all-products", shopController.getAllProducts);
 
+router.get("/buy", shopController.butNow);
+
 module.exports = router;

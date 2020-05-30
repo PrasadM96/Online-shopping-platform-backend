@@ -50,17 +50,34 @@ exports.postSellingDelete = (req, res, next) => {
     });
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 exports.getAllProducts = (req, res, next) => {
   var category = req.query.category;
   category = category.charAt(0).toUpperCase() + category.slice(1);
   console.log(category);
 
   Products.find({ category: category })
-    .populate("userId")
+    //.populate("userId")
     .then((products) => {
       res.status(200).send(products);
     })
     .catch((err) => {
       res.status(400).send(err);
+    });
+};
+
+exports.butNow = (req, res, next) => {
+  Products.find({ userId: "5e89116d64547e20500fba3a" })
+    .then((user) => {
+      console.log(user);
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save((err) => {
+        console.log(err);
+      });
+      res.send(user);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };

@@ -2,17 +2,22 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
-
-//const User = require("./routes/Users");
-
-
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
 
+const MONGODB_URL =
+  "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping";
+
+// const store = new MongoDBStore({
+//   uri: MONGODB_URL,
+//   collection: "sessions",
+// });
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
   })
 );
 
@@ -26,8 +31,31 @@ const errcontroller = require("./controllers/error");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+// app.use(
+//   session({
+//     secret: "my secret",
+//     cookie: {
+//       cookie: { maxAge: 2628000000 },
+//     },
+//     resave: false,
+//     saveUninitialized: false,
+//     store: store,
+//   })
+// );
 
-/*app.use((req, res, next) => {
+// app.use((req, res, next) => {
+//   if (!req.session.user) {
+//     return next();
+//   }
+//   User.findById(req.session.user._id)
+//     .then((user) => {
+//       req.user = user;
+//       next();
+//     })
+//     .catch((err) => console.log(err));
+// });
+/*
+app.use((req, res, next) => {
   User.findById("5e89116d64547e20500fba3a")
     .then((user) => {
       req.user = user;
@@ -52,19 +80,12 @@ app.use("/user", userRoutes);
 app.use(errcontroller.get404);
 
 mongoose
-  .connect(
-    "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping?retryWrites=true&w=majority",
-    { useNewUrlParser: true }
+  .connect(MONGODB_URL, { useNewUrlParser: true })
+  .then(() =>
+    console.log(
+      "connected-----------------------------------------------------"
+    )
   )
-  .then(() => 
-      console.log("connected-----------------------------------------------------"))
-  .catch(err => console.log(err))
+  .catch((err) => console.log(err));
 
-  
-
-  app.listen(5000);
-  
-
-  
-
-
+app.listen(5000);
