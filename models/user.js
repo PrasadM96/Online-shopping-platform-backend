@@ -4,19 +4,43 @@ const Schema = mongoose.Schema;
 const userShema = new Schema({
   first_name: {
     type: String,
-    required: true,
+    required: false,
   },
   last_name: {
     type: String,
-    required: true,
+    required: false,
   },
   email: {
     type: String,
-    required: true,
+    required: false,
   },
   password: {
     type: String,
-    required: true,
+    required: false,
+  },
+  address1: {
+    type: String,
+    required: false,
+  },
+  address2: {
+    type: String,
+    required: false,
+  },
+  city: {
+    type: String,
+    required: false,
+  },
+  zip: {
+    type: String,
+    required: false,
+  },
+  country: {
+    type: String,
+    required: false,
+  },
+  province: {
+    type: String,
+    required: false,
   },
   cart: {
     items: [
@@ -24,7 +48,7 @@ const userShema = new Schema({
         productId: {
           type: Schema.Types.ObjectId,
           ref: "Products",
-          required: true,
+          required: false,
         },
         quantity: { type: Number, required: true },
       },

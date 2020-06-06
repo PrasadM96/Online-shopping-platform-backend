@@ -9,4 +9,6 @@ router.post("/register", userController.Register);
 
 router.post("/login", userController.Login);
 
+router.post("/profile", userController.Profile);
+
 module.exports = router;
