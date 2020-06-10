@@ -50,11 +50,6 @@ exports.Login = (req, res) => {
             last_name: user.last_name,
             email: user.email,
           };
-          // req.session.isLoggedIn = true;
-          // req.session.user = user;
-          // req.session.save((err) => {
-          //   console.log(err);
-          // });
 
           let token = jwt.sign(
             payload,
@@ -63,12 +58,13 @@ exports.Login = (req, res) => {
               expiresIn: 1440,
             },
             (err, token) => {
+              console.log(token);
               res.json({
                 success: true,
               });
+              return res.send(token);
             }
           );
-          return res.send(token);
         } else {
           console.log("erroe");
           res.send("Invalid email or password,please try again");
@@ -80,5 +76,43 @@ exports.Login = (req, res) => {
     })
     .catch((err) => {
       return res.status(400).send(err);
+    });
+};
+
+exports.Login2 = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  User.findOne({ email: email })
+    .then((user) => {
+      console.log(user);
+
+      if (!user) {
+        return res
+          .status(400)
+          .send("Invalid email or password,please try again");
+      }
+      bcrypt.compare(password, user.password).then((doMatch) => {
+        if (doMatch) {
+          //send token
+          const payload = {
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+          };
+
+          var token = jwt.sign(payload, process.env.SECRET_KEY, {
+            expiresIn: 3600,
+          });
+          return res.json({ token: token, payload: payload });
+        }
+        return res
+          .status(422)
+          .send("Invalid email or password,please try again");
+      });
+    })
+    .catch((error) => {
+      return res.send(400).send(error);
     });
 };

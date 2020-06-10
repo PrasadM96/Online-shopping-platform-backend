@@ -2,58 +2,57 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 
 const MONGODB_URL =
   "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping";
 
-// const store = new MongoDBStore({
-//   uri: MONGODB_URL,
-//   collection: "sessions",
-// });
-
-app.use(
-  cors({
-    origin: "http://localhost:3001",
-  })
-);
+app.use(cors());
+app.use("images", express.static(path.join(__dirname, "images")));
 
 //routes
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const userRoutes = require("./routes/users");
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+//
+//const upload = multer({ storage: fileStorage, fileFilter: fileFilter });
 //error controllers
 const errcontroller = require("./controllers/error");
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-// app.use(
-//   session({
-//     secret: "my secret",
-//     cookie: {
-//       cookie: { maxAge: 2628000000 },
-//     },
-//     resave: false,
-//     saveUninitialized: false,
-//     store: store,
-//   })
-// );
+app.use(
+  multer({
+    /*storage: fileStorage*/ dest: "images",
+    fileFilter: fileFilter,
+  }).array("file", 12)
+);
 
-// app.use((req, res, next) => {
-//   if (!req.session.user) {
-//     return next();
-//   }
-//   User.findById(req.session.user._id)
-//     .then((user) => {
-//       req.user = user;
-//       next();
-//     })
-//     .catch((err) => console.log(err));
-// });
+app.use(bodyParser.json());
+
 /*
 app.use((req, res, next) => {
   User.findById("5e89116d64547e20500fba3a")
@@ -80,7 +79,7 @@ app.use("/user", userRoutes);
 app.use(errcontroller.get404);
 
 mongoose
-  .connect(MONGODB_URL, { useNewUrlParser: true })
+  .connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() =>
     console.log(
       "connected-----------------------------------------------------"
