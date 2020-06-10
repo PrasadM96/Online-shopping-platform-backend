@@ -49,10 +49,16 @@ exports.Login = (req, res) => {
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
+            address1: user.address1,
+            address2: user.address2,
+            city: user.city,
+            zip: user.zip,
+            country: user.country,
+            province: user.province,
           };
 
           let token = jwt.sign(
-            payload,
+            { data: "payload" },
             process.env.SECRET_KEY,
             {
               expiresIn: 1440,
@@ -100,6 +106,12 @@ exports.Login2 = (req, res, next) => {
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
+            address1: user.address1,
+            address2: user.address2,
+            city: user.city,
+            zip: user.zip,
+            country: user.country,
+            province: user.province,
           };
 
           var token = jwt.sign(payload, process.env.SECRET_KEY, {
@@ -115,4 +127,58 @@ exports.Login2 = (req, res, next) => {
     .catch((error) => {
       return res.send(400).send(error);
     });
+};
+
+exports.Profile = (req, res, next) => {
+  /*
+    User.findOne({
+      email: req.body.email,
+    })
+    .then((user) => {
+      if (user) {
+      console.log(req.body.email)*/
+  const profileData = new User({
+    first_name: req.body.firstname,
+    last_name: req.body.lastname,
+    address1: req.body.address1,
+    address2: req.body.address2,
+    city: req.body.city,
+    zip: req.body.zip,
+    country: req.body.country,
+    province: req.body.province,
+  });
+  /*
+        profileData.update()
+        
+            console.log("created success");
+            res.status(200).send("success");
+    }})
+          .catch((err) => {
+            console.log("error")
+            res.status(400).send(err);
+          });
+      }
+   */
+
+  User.findByIdAndUpdate(
+    req.body.user_id,
+    {
+      address1: req.body.address1,
+      address2: req.body.address2,
+      city: req.body.city,
+      zip: req.body.zip,
+      country: req.body.country,
+      province: req.body.province,
+      first_name: req.body.firstname,
+      last_name: req.body.lastname,
+    },
+    function (err, { result }) {
+      if (err) {
+        res.send(err);
+      } else {
+        console.log(profileData);
+        res.send(profileData);
+      }
+    }
+  );
 };
