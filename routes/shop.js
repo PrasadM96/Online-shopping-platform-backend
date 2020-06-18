@@ -11,10 +11,12 @@ router.get("/get-selling-products", shopController.getSellingProducts);
 
 router.post("/delete-selling-item", shopController.postSellingDelete);
 
-router.get("/get-all-products", auth, shopController.getAllProducts);
+router.get("/get-all-products", shopController.getAllProducts);
 
 router.get("/buy", shopController.butNow);
 
 router.post("/search", shopController.getSearchReuslts);
+
+router.get("/get-single-product", shopController.getSingleProduct);
 
 module.exports = router;

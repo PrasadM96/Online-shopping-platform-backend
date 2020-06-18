@@ -4,10 +4,9 @@ exports.postAddProduct = (req, res, next) => {
   var arr;
   if (req.files.length > 0) {
     arr = req.files.map((file) => {
-      return file.path + "." + file.mimetype.split("/")[1];
+      return "http://localhost:5000/" + file.path;
     });
   }
-  console.log(arr);
 
   console.log(req.body);
   console.log(req.files);
@@ -19,6 +18,7 @@ exports.postAddProduct = (req, res, next) => {
     condition: req.body.condition,
     description: req.body.description,
     sellingArea: req.body.sellingArea,
+    quantity: req.body.quantity,
     price: req.body.price,
     shippingFee: req.body.shippingFee,
     imageUrls: arr,
@@ -29,7 +29,8 @@ exports.postAddProduct = (req, res, next) => {
     .save()
     .then((result) => {
       console.log("created success");
-      res.status(200).send(result);
+      // res.status(200).send(result);
+      res.redirect("/selling/my-items");
     })
     .catch((err) => {
       res.status(400).send(err);
@@ -113,5 +114,16 @@ exports.getSearchReuslts = (req, res, next) => {
     })
     .catch((err) => {
       res.status(400).send(err);
+    });
+};
+
+exports.getSingleProduct = (req, res, next) => {
+  const id = req.query.id;
+  Products.find({ _id: id })
+    .then((item) => {
+      res.status(200).json(item);
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err });
     });
 };

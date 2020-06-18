@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 
@@ -11,7 +12,6 @@ const MONGODB_URL =
   "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping";
 
 app.use(cors());
-app.use("images", express.static(path.join(__dirname, "images")));
 
 //routes
 const adminRoutes = require("./routes/admin");
@@ -23,7 +23,7 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.originalname);
+    cb(null, uuidv4().toString().replace(/-/g, "_") + "_" + file.originalname);
   },
 });
 
@@ -38,20 +38,20 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
-//
-//const upload = multer({ storage: fileStorage, fileFilter: fileFilter });
+
 //error controllers
 const errcontroller = require("./controllers/error");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({
-    /*storage: fileStorage*/ dest: "images",
+    storage: fileStorage /* dest: "images"*/,
     fileFilter: fileFilter,
   }).array("file", 12)
 );
 
 app.use(bodyParser.json());
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 /*
 app.use((req, res, next) => {
