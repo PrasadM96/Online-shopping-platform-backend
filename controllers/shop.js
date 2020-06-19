@@ -1,6 +1,17 @@
 const Products = require("../models/products");
 
 exports.postAddProduct = (req, res, next) => {
+  var arr;
+  if (req.files.length > 0) {
+    arr = req.files.map((file) => {
+      return file.path + "." + file.mimetype.split("/")[1];
+    });
+  }
+  console.log(arr);
+
+  console.log(req.body);
+  console.log(req.files);
+
   const product = new Products({
     title: req.body.title,
     category: req.body.category,
@@ -10,9 +21,10 @@ exports.postAddProduct = (req, res, next) => {
     sellingArea: req.body.sellingArea,
     price: req.body.price,
     shippingFee: req.body.shippingFee,
-    imageUrls: req.body.files,
-    userId: req.user._id,
+    imageUrls: arr,
+    userId: "5e89116d64547e20500fba3a",
   });
+
   product
     .save()
     .then((result) => {
@@ -79,5 +91,27 @@ exports.butNow = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+    });
+};
+
+////////////////////////////////////////////////////////
+exports.getSearchReuslts = (req, res, next) => {
+  var keyword = req.body.keyword;
+  console.log(keyword);
+
+  Products.find({
+    $or: [
+      {
+        title: new RegExp(keyword, "i"),
+      },
+      { category: new RegExp(keyword, "i") },
+      { subCategory: new RegExp(keyword, "i") },
+    ],
+  })
+    .then((products) => {
+      res.send(products);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
     });
 };
