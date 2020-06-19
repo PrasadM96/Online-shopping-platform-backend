@@ -1,5 +1,5 @@
 const express = require("express");
-const auth = require("../middleWare/auth");
+//const auth = require("../middleWare/auth");
 
 const shopController = require("../controllers/shop");
 
@@ -11,7 +11,7 @@ router.get("/get-selling-products", shopController.getSellingProducts);
 
 router.post("/delete-selling-item", shopController.postSellingDelete);
 
-router.get("/get-all-products", auth, shopController.getAllProducts);
+router.get("/get-all-products", shopController.getAllProducts);
 
 router.get("/buy", shopController.butNow);
 
