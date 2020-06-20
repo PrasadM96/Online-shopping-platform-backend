@@ -79,7 +79,7 @@ app.use("/user", userRoutes);
 app.use(errcontroller.get404);
 
 mongoose
-  .connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify:false })
   .then(() =>
     console.log(
       "connected-----------------------------------------------------"
