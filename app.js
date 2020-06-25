@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const multer = require("multer");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 const User = require("./models/user");
 
@@ -17,7 +18,6 @@ app.use(
 );
 
 app.use(cors());
-app.use("images", express.static(path.join(__dirname, "images")));
 
 
 //routes
@@ -29,7 +29,7 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.originalname);
+    cb(null, uuidv4().toString().replace(/-/g, "_") + "_" + file.originalname);
   },
 });
 
@@ -44,23 +44,22 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
-//
-//const upload = multer({ storage: fileStorage, fileFilter: fileFilter });
+
 //error controllers
 const errcontroller = require("./controllers/error");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({
-    /*storage: fileStorage*/ dest: "images",
+    storage: fileStorage /* dest: "images"*/,
     fileFilter: fileFilter,
   }).array("file", 12)
 );
 
 app.use(bodyParser.json());
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 
-/*
 app.use((req, res, next) => {
   User.findById("5e89116d64547e20500fba3a")
 
@@ -83,12 +82,19 @@ app.use("/shop", shopRoutes);
 //404 error
 app.use(errcontroller.get404);
 
-mongoose
-  .connect(
-    "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping?retryWrites=true&w=majority",
-    { useNewUrlParser: true }
+app.use((error, req, res, next) => {
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
+});
 
-  .connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  })
   .then(() =>
     console.log(
       "connected-----------------------------------------------------"
@@ -114,4 +120,4 @@ mongoose
   })
   .catch((error) => {
     console.log(error);
-  });*/
+  });
