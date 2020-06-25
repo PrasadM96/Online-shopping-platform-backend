@@ -82,7 +82,7 @@ app.use("/shop", shopRoutes);
 
 //404 error
 app.use(errcontroller.get404);
-*/
+
 mongoose
   .connect(
     "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping?retryWrites=true&w=majority",
@@ -114,4 +114,4 @@ mongoose
   })
   .catch((error) => {
     console.log(error);
-  }));
+  });*/
