@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.post("/post-product", auth, shopController.postAddProduct);
 
-router.get("/get-selling-products", shopController.getSellingProducts);
+router.get("/get-selling-products", auth, shopController.getSellingProducts);
 
-router.post("/delete-selling-item", shopController.postSellingDelete);
+router.post("/delete-selling-item", auth, shopController.postSellingDelete);
 
 router.get("/get-all-products", shopController.getAllProducts);
 

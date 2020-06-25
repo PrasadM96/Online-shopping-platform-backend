@@ -17,7 +17,7 @@ function auth(req, res, next) {
     User.findById(decoded.id)
       .then((user) => {
         req.user = user;
-        // console.log(req.user);
+        console.log(user);
         next();
       })
       .catch((err) => {

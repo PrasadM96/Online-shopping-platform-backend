@@ -110,3 +110,52 @@ exports.User = (req, res, next) => {
     .select("-password")
     .then((user) => res.json(user));
 };
+exports.Profile = (req, res, next) => {
+  const profileData = new User({
+    first_name: req.body.firstname,
+    last_name: req.body.lastname,
+    address1: req.body.address1,
+    address2: req.body.address2,
+    city: req.body.city,
+    zip: req.body.zip,
+    country: req.body.country,
+    province: req.body.province,
+  });
+  /*
+          profileData.update()
+          
+              console.log("created success");
+              res.status(200).send("success");
+      }})
+            .catch((err) => {
+              console.log("error")
+              res.status(400).send(err);
+            });
+        }
+     */
+
+  console.log(req.body.user_id);
+
+  User.findByIdAndUpdate(
+    req.body.user_id,
+    {
+      address1: req.body.address1,
+      address2: req.body.address2,
+      city: req.body.city,
+      zip: req.body.zip,
+      country: req.body.country,
+      province: req.body.province,
+      first_name: req.body.firstname,
+      last_name: req.body.lastname,
+    },
+    function (err, result) {
+      if (err) {
+        res.send(err);
+      } else {
+        //console.log(result.first_name);
+        //console.log(profileData)
+        res.send(profileData);
+      }
+    }
+  );
+};

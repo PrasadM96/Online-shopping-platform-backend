@@ -1,5 +1,5 @@
 const Products = require("../models/products");
-const products = require("../models/products");
+
 const { count } = require("../models/products");
 
 exports.postAddProduct = (req, res, next) => {
@@ -41,7 +41,7 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.getSellingProducts = (req, res, next) => {
   Products.find({ userId: req.user._id })
-    .populate("userId", "email")
+    // .populate("userId", "email")
     .then((products) => {
       res.status(200).send(products);
     })
@@ -134,28 +134,37 @@ exports.getSingleProduct = (req, res, next) => {
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   var result = null;
+  let productItem = null;
   Products.findById(prodId)
     .then((product) => {
+      if (!product) {
+        const error = new Error("No item found");
+        error.statusCode = 404;
+        throw error;
+      }
+
       if (product.quantity === 0) {
-        return res
-          .status(400)
-          .json({ error: { message: "No enough items. Try again later!" } });
+        const error = new Error("No enough items. Try again later!");
+        error.statusCode = 400;
+        throw error;
       }
 
       product.quantity = product.quantity - 1;
-      return product.save().then((result) => {
-        return req.user.addToCart(product);
-      });
+      productItem = product;
+      return product.save();
     })
     .then((result) => {
-      res.json(result);
+      return req.user.addToCart(productItem);
+    })
+    .then((result) => {
+      res.json({ result: result, message: "add to cart success!" });
     })
     .catch((err) => {
       console.log("add to cart error");
-
-      res
-        .status(400)
-        .json({ error: { message: "Add to cart failed, Try again!" } });
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 
@@ -269,6 +278,7 @@ exports.getCart = (req, res, next) => {
       });
 
       // console.log((arr[0].cartItemCount = 23));
+      console.log(arr);
 
       res.status(200).json({ cartArr: arr, count: cartItems });
     })
