@@ -69,7 +69,7 @@ exports.Login = (req, res, next) => {
 
   //simple validation
   if (!email || !password) {
-    return res.status(400).json({ msg: "Please anter all fiels" });
+    return res.status(400).json({ msg: "Please anter all fields" });
   }
 
   //check for exiting user
@@ -84,10 +84,18 @@ exports.Login = (req, res, next) => {
         return res.status(400).json({ msg: "Invalid password or email" });
       }
 
+      const expiresIn = 3600;
+      let time = new Date();
+      console.log(time);
+
+      // time.setSeconds(time.getSeconds() + expiresIn);
+      time = new Date(time.getTime() + expiresIn * 1000);
+      console.log(time);
+
       jwt.sign(
         { id: user.id },
         config.get("jwtSecret"),
-        { expiresIn: 3600 },
+        { expiresIn: expiresIn },
         (err, token) => {
           if (err) throw err;
           res.json({
@@ -97,6 +105,7 @@ exports.Login = (req, res, next) => {
               first_name: user.first_name,
               last_name: user.last_name,
               email: user.email,
+              expiresIn: time,
             },
           });
         }
