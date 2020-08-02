@@ -17,7 +17,7 @@ exports.Register = (req, res, next) => {
   //@access public
 
   const { first_name, last_name, email, password } = req.body;
-
+  const sellerStatus = false;
   //simple validation
   if (!first_name || !last_name || !email || !password) {
     return res.status(400).json({ msg: "Please anter all fiels" });
@@ -33,6 +33,7 @@ exports.Register = (req, res, next) => {
       last_name,
       email,
       password,
+      sellerStatus,
     });
 
     //create salt & hash
@@ -85,12 +86,6 @@ exports.Login = (req, res, next) => {
       }
 
       const expiresIn = 3600;
-      let time = new Date();
-      console.log(time);
-
-      // time.setSeconds(time.getSeconds() + expiresIn);
-      time = new Date(time.getTime() + expiresIn * 1000);
-      console.log(time);
 
       jwt.sign(
         { id: user.id },
@@ -105,7 +100,8 @@ exports.Login = (req, res, next) => {
               first_name: user.first_name,
               last_name: user.last_name,
               email: user.email,
-              expiresIn: time,
+              sellerStatus: user.sellerStatus,
+              expiresIn: expiresIn,
             },
           });
         }
@@ -119,6 +115,21 @@ exports.User = (req, res, next) => {
     .select("-password")
     .then((user) => res.json(user));
 };
+
+exports.checkState = (req, res, next) => {
+  User.findById(req.user._id)
+    .select("sellerStatus")
+    .then((result) => {
+      return res.json({ sellerStatus: result });
+    })
+    .catch((error) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
 exports.Profile = (req, res, next) => {
   const profileData = new User({
     first_name: req.body.firstname,

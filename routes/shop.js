@@ -29,4 +29,6 @@ router.post("/remove-from-cart", auth, shopController.postCartRemoveProduct);
 
 router.get("/get-cart", auth, shopController.getCart);
 
+router.post("/update-item", auth, shopController.updateSellingItem);
+
 module.exports = router;

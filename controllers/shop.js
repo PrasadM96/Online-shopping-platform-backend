@@ -6,7 +6,7 @@ exports.postAddProduct = (req, res, next) => {
   var arr;
   if (req.files.length > 0) {
     arr = req.files.map((file) => {
-      return "http://localhost:5000/" + file.path;
+      return file.path;
     });
   }
 
@@ -62,6 +62,53 @@ exports.postSellingDelete = (req, res, next) => {
     })
     .catch((err) => {
       res.status(400).send(err);
+    });
+};
+
+exports.updateSellingItem = (req, res, next) => {
+  var arr = [];
+
+  if (req.files.length > 0) {
+    arr = req.files.map((file) => {
+      return file.path;
+    });
+  }
+
+  if (req.body.fileUrls) {
+    if (Array.isArray(req.body.fileUrls)) {
+      req.body.fileUrls.map((element) => {
+        arr.push(element);
+      });
+    } else {
+      arr.push(req.body.fileUrls);
+    }
+  }
+  console.log(arr);
+
+  Products.findById(req.body.id)
+    .then((product) => {
+      product.title = req.body.title;
+      product.category = req.body.category;
+      product.subCategory = req.body.subCategory;
+      product.condition = req.body.condition;
+      product.description = req.body.description;
+      product.sellingArea = req.body.sellingArea;
+      product.quantity = req.body.quantity;
+      product.price = req.body.price;
+      product.shippingFee = req.body.shippingFee;
+      product.imageUrls = arr;
+
+      return product.save();
+    })
+    .then((result) => {
+      console.log("success");
+      res.json({ msg: "update success", result: result });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 

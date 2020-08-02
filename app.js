@@ -9,7 +9,8 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 
 const MONGODB_URL =
-  "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping";
+  "mongodb+srv://user:user@cluster0.uwoz0.mongodb.net/online-shopping";
+// "mongodb+srv://user:user@cluster0-kiwz1.mongodb.net/online-shopping";
 
 app.use(cors());
 
@@ -17,6 +18,7 @@ app.use(cors());
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const userRoutes = require("./routes/users");
+const sellerRoutes = require("./routes/seller");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -24,6 +26,7 @@ const fileStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, uuidv4().toString().replace(/-/g, "_") + "_" + file.originalname);
+    // uuidv4().toString().replace(/-/g, "_") + "_" +
   },
 });
 
@@ -41,6 +44,7 @@ const fileFilter = (req, file, cb) => {
 
 //error controllers
 const errcontroller = require("./controllers/error");
+const { ppid } = require("process");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
@@ -53,19 +57,6 @@ app.use(
 app.use(bodyParser.json());
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-/*
-app.use((req, res, next) => {
-  User.findById("5e89116d64547e20500fba3a")
-    .then((user) => {
-      req.user = user;
-      // console.log(req.user);
-      next();
-    })
-    .catch((err) => {
-      console.log("error");
-    });
-});
-*/
 //admin routes
 app.use("/admin", adminRoutes);
 
@@ -74,6 +65,9 @@ app.use("/shop", shopRoutes);
 
 //user routes
 app.use("/user", userRoutes);
+
+//seller routes
+app.use("/seller", sellerRoutes);
 
 //404 error
 app.use(errcontroller.get404);
