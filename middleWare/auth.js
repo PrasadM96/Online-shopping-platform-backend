@@ -13,18 +13,21 @@ function auth(req, res, next) {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
 
     //add user from payload
-    console.log(decoded);
+
     User.findById(decoded.id)
       .then((user) => {
         req.user = user;
-        console.log(user);
         next();
       })
       .catch((err) => {
         res.json(err);
       });
-  } catch (e) {
-    res.status(400).json({ msg: "Token is not valid" });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    err.message = "Token Not Valid";
+    next(err);
   }
 
   //verify token
