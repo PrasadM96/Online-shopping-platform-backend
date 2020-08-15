@@ -227,7 +227,7 @@ exports.postCartRemoveProduct = (req, res, next) => {
       });
     })
     .then((result) => {
-      console.log("succecc remove");
+      console.log("success remove");
       res.status(200).json(result);
     })
     .catch((err) => {
