@@ -9,6 +9,8 @@ const auth = require("../middleware/auth");
 //user model
 
 const User = require("../models/user");
+const Product = require("../models/products");
+const Seller = require("../models/seller");
 
 process.env.SECRET_KEY = "secret";
 exports.Register = (req, res, next) => {
@@ -18,6 +20,7 @@ exports.Register = (req, res, next) => {
 
   const { first_name, last_name, email, password } = req.body;
   const sellerStatus = false;
+  const status = false;
   //simple validation
   if (!first_name || !last_name || !email || !password) {
     return res.status(400).json({ msg: "Please anter all fiels" });
@@ -28,12 +31,15 @@ exports.Register = (req, res, next) => {
     if (user) {
       return res.status(400).json({ msg: "User already exits" });
     }
+    
     const newUser = new User({
       first_name,
       last_name,
       email,
       password,
       sellerStatus,
+      status
+
     });
 
     //create salt & hash
@@ -68,9 +74,54 @@ exports.Register = (req, res, next) => {
 exports.Login = (req, res, next) => {
   const { email, password } = req.body;
 
+  
+ 
+
+  //get user cunt
+  let userCount =0 ;
+  
+  User.countDocuments({} ,function( err, count){
+    if(err){
+      console.log(err);
+
+    }
+    else{
+  userCount = count;
+  console.log( "Number of users:", userCount );}
+})  
+//get product count
+let productCount =0 ;
+  
+Product.countDocuments({} ,function( err, count){
+  if(err){
+    console.log(err);
+
+  }
+  else{
+productCount = count;
+console.log( "Number of users:", productCount );}
+})  
+
+//sellercount
+let sellerCount =0 ;
+  
+Seller.countDocuments({} ,function( err, count){
+  if(err){
+    console.log(err);
+
+  }
+  else{
+sellerCount = count;
+console.log( "Number of users:", sellerCount );}
+})  
+
+
+
+ 
+
   //simple validation
   if (!email || !password) {
-    return res.status(400).json({ msg: "Please anter all fields" });
+    return res.status(400).json({ msg: "Please enter all fields" });
   }
 
   //check for exiting user
@@ -78,17 +129,31 @@ exports.Login = (req, res, next) => {
     if (!user) {
       return res.status(400).json({ msg: "User does not exits" });
     }
+    /*const status = 0//for user
+    if(user.email == "sakuni@gmail.com"){
+     status =1
+     
+    }*/
 
+   
+   
     //compare
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (!isMatch) {
         return res.status(400).json({ msg: "Invalid password or email" });
       }
 
-      const expiresIn = 3600;
+     
 
-      jwt.sign(
+    
+
+     
+      const expiresIn = 3600;
+      if(user.status==false){
+        
+        jwt.sign(
         { id: user.id },
+        
         config.get("jwtSecret"),
         { expiresIn: expiresIn },
         (err, token) => {
@@ -102,10 +167,45 @@ exports.Login = (req, res, next) => {
               email: user.email,
               sellerStatus: user.sellerStatus,
               expiresIn: expiresIn,
+              status : user.status
             },
+            
           });
         }
       );
+      }
+      else{
+      
+        
+        jwt.sign(
+        
+          { id: user.id },
+          
+          config.get("jwtSecret"),
+          { expiresIn: expiresIn },
+          (err, token) => {
+            if (err) throw err;
+            res.json({
+              token,
+              user: {
+                id: user.id,
+                sellerStatus: user.sellerStatus,
+                expiresIn: expiresIn,
+                status : user.status,
+                first_name:user.first_name
+               
+               
+
+              },
+              userCount,
+              productCount,
+              sellerCount
+            });
+          }
+        );
+        console.log("hii admin")
+
+      }
     });
   });
 };
@@ -178,4 +278,22 @@ exports.Profile = (req, res, next) => {
       }
     }
   );
+};
+
+
+exports.checkAdminState = (req, res, next) => {
+  let s=null
+  User.findById(req.user._id)
+    .select("status")
+    .then((result) => {
+      console.log(result);
+      return res.json({ status: result });
+    })
+    .catch((error) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+
 };
