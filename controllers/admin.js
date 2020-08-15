@@ -48,3 +48,17 @@ exports.getSellerList = async (req, res) => {
       return res.status(200).json({ success: true, data: sellers })
   }).catch(err => console.log(err))
 }
+
+exports.getOrders = async (req, res) => {
+    await Seller.find({}, (err, orders) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if (!orders.length) {
+            return res
+                .status(404)
+                .json({ success: false, error: `orders not found` })
+        }
+        return res.status(200).json({ success: true, data: orders })
+    }).catch(err => console.log(err))
+  }
