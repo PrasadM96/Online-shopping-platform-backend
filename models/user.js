@@ -47,6 +47,10 @@ const userSchema = new Schema(
       type: Boolean,
       required: false,
     },
+    status: {
+      type: Boolean,
+      required: false,
+    },
     cart: {
       items: [
         {

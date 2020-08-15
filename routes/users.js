@@ -16,6 +16,8 @@ router.get("/user", userController.User);
 
 router.get("/check", auth, userController.checkState);
 
+router.get("/checkAdminStatus",auth,userController.checkAdminState)
+
 // router.post("/selling-register", auth, userController.sellingRegister);
 
 module.exports = router;
