@@ -19,6 +19,7 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const userRoutes = require("./routes/users");
 const sellerRoutes = require("./routes/seller");
+const orderRoutes = require("./routes/orders");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -68,6 +69,9 @@ app.use("/user", userRoutes);
 
 //seller routes
 app.use("/seller", sellerRoutes);
+
+//order routes
+app.use("/order", orderRoutes);
 
 //404 error
 app.use(errcontroller.get404);
