@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const dbHandler = require("./db-handler");
 const user = require("../controllers/user");
 
-const mockRequest = (sessionData, body) => ({
+const mockRequest = (sessionData, body, user) => ({
   session: { data: sessionData },
   body,
+  user,
 });
 
 const mockResponse = () => {
@@ -31,6 +32,9 @@ afterEach(async () => await dbHandler.clearDatabase());
  */
 afterAll(async () => await dbHandler.closeDatabase());
 
+/**
+ * Unit testing for login function
+ */
 describe("login", () => {
   test("should 400 if email is missing from body", async () => {
     const req = mockRequest({}, { password: "boss" });
@@ -51,30 +55,57 @@ describe("login", () => {
     });
   });
 });
-
-describe("product ", () => {
-  it("can be created correctly", async () => {
-    expect(async () => await user.create(productComplete)).not.toThrow();
+/**
+ * Unit testing for register function
+ */
+describe("register", () => {
+  test("should 400 if first name is missing from body", async () => {
+    const req = mockRequest({}, { first_name: "boss" });
+    const res = mockResponse();
+    await user.Register(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      msg: "Please enter all fields",
+    });
+  });
+  test("should 400 if last name is missing from body", async () => {
+    const req = mockRequest({}, { last_name: "boss" });
+    const res = mockResponse();
+    await user.Register(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      msg: "Please enter all fields",
+    });
+  });
+  test("should 400 if email is missing from body", async () => {
+    const req = mockRequest({}, { email: "boss@gmail.com" });
+    const res = mockResponse();
+    await user.Register(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      msg: "Please enter all fields",
+    });
+  });
+  test("should 400 if password is missing from body", async () => {
+    const req = mockRequest({}, { password: "boss" });
+    const res = mockResponse();
+    await user.Register(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      msg: "Please enter all fields",
+    });
+  });
+  test("should 400 if password is missing from body", async () => {
+    const req = mockRequest(
+      {},
+      {
+        first_name: "as",
+        last_name: "df",
+        email: "as@gmail.com",
+        password: "boss",
+      }
+    );
+    const res = mockResponse();
+    await user.Register(req, res).not.toBe(null);
   });
 });
-
-/**
- * Complete product example.
- */
-const productComplete = {
-  title: "Fashion 1",
-  category: "Fashion",
-  subCategory: "Watches",
-  condition: "New",
-  description: "sdad",
-  sellingArea: "Europe",
-  quantity: 6,
-  price: 699,
-  shippingFee: 2,
-  imageUrls: [
-    "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-    "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-    "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-  ],
-  userId: "5e89116d64547e20500fba3a",
-};

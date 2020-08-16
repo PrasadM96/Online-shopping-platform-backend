@@ -1,6 +1,12 @@
 const User = require("../models/user");
 const Seller = require("../models/seller");
 
+exports.create = async (seller) => {
+  if (!seller) throw new Error("Missing seller");
+
+  await Seller.create(seller);
+};
+
 exports.postSellerRegister = (req, res, next) => {
   const { name, address, city, state, zip, teleNumber, country } = req.body;
   const seller = new Seller({

@@ -4,6 +4,12 @@ const stripe = require("stripe")(
 );
 const { v4: uuidv4 } = require("uuid");
 
+exports.create = async (order) => {
+  if (!order) throw new Error("Missing order");
+
+  await Order.create(order);
+};
+
 exports.postOrder = async (req, res, next) => {
   console.log(req.body);
 

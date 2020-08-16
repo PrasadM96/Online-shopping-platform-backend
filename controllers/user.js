@@ -30,7 +30,7 @@ exports.Register = (req, res, next) => {
   const status = false;
   //simple validation
   if (!first_name || !last_name || !email || !password) {
-    return res.status(400).json({ msg: "Please anter all fiels" });
+    return res.status(400).json({ msg: "Please enter all fields" });
   }
 
   //check for exiting user
