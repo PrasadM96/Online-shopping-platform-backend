@@ -13,6 +13,13 @@ const Product = require("../models/products");
 const Seller = require("../models/seller");
 
 process.env.SECRET_KEY = "secret";
+
+exports.create = async (product) => {
+  if (!product) throw new Error("Missing product");
+
+  await Product.create(product);
+};
+
 exports.Register = (req, res, next) => {
   //get api/users
   //@desc register user
@@ -31,15 +38,14 @@ exports.Register = (req, res, next) => {
     if (user) {
       return res.status(400).json({ msg: "User already exits" });
     }
-    
+
     const newUser = new User({
       first_name,
       last_name,
       email,
       password,
       sellerStatus,
-      status
-
+      status,
     });
 
     //create salt & hash
@@ -74,50 +80,37 @@ exports.Register = (req, res, next) => {
 exports.Login = (req, res, next) => {
   const { email, password } = req.body;
 
-  
- 
-
   //get user cunt
-  let userCount =0 ;
-  
-  User.countDocuments({} ,function( err, count){
-    if(err){
+  let userCount = 0;
+
+  User.countDocuments({}, function (err, count) {
+    if (err) {
       console.log(err);
-
+    } else {
+      userCount = count;
     }
-    else{
-  userCount = count;
-  console.log( "Number of users:", userCount );}
-})  
-//get product count
-let productCount =0 ;
-  
-Product.countDocuments({} ,function( err, count){
-  if(err){
-    console.log(err);
+  });
+  //get product count
+  let productCount = 0;
 
-  }
-  else{
-productCount = count;
-console.log( "Number of users:", productCount );}
-})  
+  Product.countDocuments({}, function (err, count) {
+    if (err) {
+      console.log(err);
+    } else {
+      productCount = count;
+    }
+  });
 
-//sellercount
-let sellerCount =0 ;
-  
-Seller.countDocuments({} ,function( err, count){
-  if(err){
-    console.log(err);
+  //sellercount
+  let sellerCount = 0;
 
-  }
-  else{
-sellerCount = count;
-console.log( "Number of users:", sellerCount );}
-})  
-
-
-
- 
+  Seller.countDocuments({}, function (err, count) {
+    if (err) {
+      console.log(err);
+    } else {
+      sellerCount = count;
+    }
+  });
 
   //simple validation
   if (!email || !password) {
@@ -127,7 +120,7 @@ console.log( "Number of users:", sellerCount );}
   //check for exiting user
   User.findOne({ email }).then((user) => {
     if (!user) {
-      return res.status(400).json({ msg: "User does not exits" });
+      return res.status(401).json({ msg: "User does not exits" });
     }
     /*const status = 0//for user
     if(user.email == "sakuni@gmail.com"){
@@ -135,52 +128,39 @@ console.log( "Number of users:", sellerCount );}
      
     }*/
 
-   
-   
     //compare
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (!isMatch) {
-        return res.status(400).json({ msg: "Invalid password or email" });
+        return res.status(401).json({ msg: "Invalid password or email" });
       }
 
-     
-
-    
-
-     
       const expiresIn = 3600;
-      if(user.status==false){
-        
+      if (user.status == false) {
         jwt.sign(
-        { id: user.id },
-        
-        config.get("jwtSecret"),
-        { expiresIn: expiresIn },
-        (err, token) => {
-          if (err) throw err;
-          res.json({
-            token,
-            user: {
-              id: user.id,
-              first_name: user.first_name,
-              last_name: user.last_name,
-              email: user.email,
-              sellerStatus: user.sellerStatus,
-              expiresIn: expiresIn,
-              status : user.status
-            },
-            
-          });
-        }
-      );
-      }
-      else{
-      
-        
-        jwt.sign(
-        
           { id: user.id },
-          
+
+          config.get("jwtSecret"),
+          { expiresIn: expiresIn },
+          (err, token) => {
+            if (err) throw err;
+            res.status(200).json({
+              token,
+              user: {
+                id: user.id,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                sellerStatus: user.sellerStatus,
+                expiresIn: expiresIn,
+                status: user.status,
+              },
+            });
+          }
+        );
+      } else {
+        jwt.sign(
+          { id: user.id },
+
           config.get("jwtSecret"),
           { expiresIn: expiresIn },
           (err, token) => {
@@ -191,20 +171,16 @@ console.log( "Number of users:", sellerCount );}
                 id: user.id,
                 sellerStatus: user.sellerStatus,
                 expiresIn: expiresIn,
-                status : user.status,
-                first_name:user.first_name
-               
-               
-
+                status: user.status,
+                first_name: user.first_name,
               },
               userCount,
               productCount,
-              sellerCount
+              sellerCount,
             });
           }
         );
-        console.log("hii admin")
-
+        console.log("hii admin");
       }
     });
   });
@@ -280,9 +256,8 @@ exports.Profile = (req, res, next) => {
   );
 };
 
-
 exports.checkAdminState = (req, res, next) => {
-  let s=null
+  let s = null;
   User.findById(req.user._id)
     .select("status")
     .then((result) => {
@@ -295,5 +270,4 @@ exports.checkAdminState = (req, res, next) => {
       }
       next(err);
     });
-
 };

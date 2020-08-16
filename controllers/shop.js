@@ -4,11 +4,11 @@ const { count } = require("../models/products");
 
 exports.postAddProduct = (req, res, next) => {
   var arr;
-  if (req.files.length > 0) {
+  /*if (req.files.length > 0) {
     arr = req.files.map((file) => {
       return file.path;
     });
-  }
+  }*/
 
   console.log(req.body);
   console.log(req.files);
@@ -23,7 +23,7 @@ exports.postAddProduct = (req, res, next) => {
     quantity: req.body.quantity,
     price: req.body.price,
     shippingFee: req.body.shippingFee,
-    imageUrls: arr,
+    imageUrls: req.body.imageUrls,
     userId: req.user._id,
   });
 
@@ -31,7 +31,7 @@ exports.postAddProduct = (req, res, next) => {
     .save()
     .then((result) => {
       console.log("created success");
-      res.status(200).send(result);
+      res.status(200).json(result);
       // res.redirect("/selling/my-items");
     })
     .catch((err) => {
@@ -43,10 +43,10 @@ exports.getSellingProducts = (req, res, next) => {
   Products.find({ userId: req.user._id })
     // .populate("userId", "email")
     .then((products) => {
-      res.status(200).send(products);
+      res.status(400).json({ error: { message: "error" } });
     })
     .catch((err) => {
-      res.status(400).send(err);
+      res.status(400).json({ error: { message: err.message } });
     });
 };
 
