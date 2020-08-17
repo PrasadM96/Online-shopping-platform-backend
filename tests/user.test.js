@@ -95,17 +95,5 @@ describe("register", () => {
       msg: "Please enter all fields",
     });
   });
-  test("should 400 if password is missing from body", async () => {
-    const req = mockRequest(
-      {},
-      {
-        first_name: "as",
-        last_name: "df",
-        email: "as@gmail.com",
-        password: "boss",
-      }
-    );
-    const res = mockResponse();
-    await user.Register(req, res).not.toBe(null);
-  });
+
 });
