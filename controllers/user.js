@@ -4,8 +4,6 @@ const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
-const auth = require("../middleware/auth");
-
 //user model
 
 const User = require("../models/user");
@@ -273,6 +271,7 @@ exports.checkAdminState = (req, res, next) => {
     });
 };
 
+
 exports.getOrders =(req,res,next)=>{
 Orders.find({userId:req.user._id})
   .then((result)=>{
@@ -289,4 +288,18 @@ Orders.find({userId:req.user._id})
 
 ;
 }
+
+
+exports.getOrders = (req, res, next) => {
+  Order.find({ userId: req.user._id })
+    .then((result) => {
+      return res.status(200).json({ success: true, data: orders });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
 

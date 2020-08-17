@@ -1,7 +1,11 @@
 const User = require("../models/user");
 const Product = require("../models/products");
 const Seller = require("../models/seller");
+
 const Orders = require("../models/orders");
+
+const Order = require("../models/orders");
+
 
 exports.getProducts = (req, res, next) => {
   res.status(200).json("Success");
@@ -49,6 +53,7 @@ exports.getSellerList = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   await Orders.find({}, (err, orders) => {
+
     if (err) {
       return res.status(400).json({ success: false, error: err });
     }
