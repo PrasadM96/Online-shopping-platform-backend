@@ -4,13 +4,12 @@ const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
-const auth = require("../middleware/auth");
-
 //user model
 
 const User = require("../models/user");
 const Product = require("../models/products");
 const Seller = require("../models/seller");
+const Order = require("../models/orders");
 
 process.env.SECRET_KEY = "secret";
 
@@ -265,6 +264,19 @@ exports.checkAdminState = (req, res, next) => {
       return res.json({ status: result });
     })
     .catch((error) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.getOrders = (req, res, next) => {
+  Order.find({ userId: req.user._id })
+    .then((result) => {
+      return res.status(200).json({ success: true, data: orders });
+    })
+    .catch((err) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
