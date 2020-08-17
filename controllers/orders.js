@@ -69,6 +69,8 @@ exports.postOrder = async (req, res, next) => {
 
     const orderStatus = await order.save();
 
+    const deletedCart = req.user.clearCart();
+
     return res.json({ message: "success", result: orderStatus });
   } catch (error) {
     if (!err.statusCode) {
@@ -77,39 +79,4 @@ exports.postOrder = async (req, res, next) => {
     err.message = "Order Failed";
     next(err);
   }
-
-  // const idempotency_key = uuidv4();
-
-  // stripe.customers
-  //   .create({
-  //     email: stripeToken.email,
-  //     source: stripeToken.id,
-  //   })
-  //   .then((res) => {
-  //     console.log(res);
-  //     return stripe.charges.create(
-  //       {
-  //         amount: totalPrice,
-  //         currency: "usd",
-  //         customer: res.id,
-  //         receipt_email: stripeToken.email,
-  //         description: `Pre Payment`,
-  //       },
-  //       {
-  //         idempotency_key,
-  //       }
-  //     );
-  //   })
-  //   .then((res) => {
-  //   return order.save();
-  // })
-  // .then((result) => {
-  //   res.json({ message: "success", result: result });
-  // })
-  // .catch((err) => {
-  //   if (!err.statusCode) {
-  //     err.statusCode = 500;
-  //   }
-  //   next(err);
-  // });
 };

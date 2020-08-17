@@ -43,7 +43,7 @@ exports.getSellingProducts = (req, res, next) => {
   Products.find({ userId: req.user._id })
     // .populate("userId", "email")
     .then((products) => {
-      res.status(200).json({ products });
+      res.status(200).json(products);
     })
     .catch((err) => {
       res.status(400).json({ error: { message: err.message } });
@@ -241,24 +241,24 @@ exports.postCartRemoveProduct = (req, res, next) => {
 
 exports.postDeleteCart = (req, res, next) => {
   const cartItemArr = req.body.cartItemArr;
-  cartItemArr.forEach((item) => {
-    console.log(item);
-    Products.findById(item.id)
-      .then((product) => {
-        product.quantity = product.quantity + parseInt(item.itemCount);
-        return product.save();
-      })
-      .catch((err) => {
-        return res
-          .status(400)
-          .json({ error: { message: "Clear cart Failed" } });
-      });
-  });
+  // cartItemArr.forEach((item) => {
+  //   console.log(item);
+  //   Products.findById(item.id)
+  //     .then((product) => {
+  //       product.quantity = product.quantity + parseInt(item.itemCount);
+  //       return product.save();
+  //     })
+  //     .catch((err) => {
+  //       return res
+  //         .status(400)
+  //         .json({ error: { message: "Clear cart Failed" } });
+  //     });
+  // });
 
   req.user
     .clearCart()
     .then((result) => {
-      res.json(result);
+      res.json({ message: "success", result: result });
     })
     .catch((err) => {
       res.json(err);
