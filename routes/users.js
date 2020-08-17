@@ -22,4 +22,6 @@ router.get("/checkAdminStatus", auth, userController.checkAdminState);
 
 router.get("/get-orders", auth, userController.getOrders);
 
+router.get("/get-all-orders", auth, userController.getAllOrders);
+
 module.exports = router;
